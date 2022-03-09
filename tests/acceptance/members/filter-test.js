@@ -1231,6 +1231,53 @@ describe('Acceptance: Members filtering', function () {
         });
     });
 
+    describe('restore filter', function () {
+        it('can restore newsletter subscribed:false filter', async function () {
+            // add some members to filter
+            this.server.createList('member', 3, {subscribed: true});
+            this.server.createList('member', 4, {subscribed: false});
+
+            await visit('/members?filter=subscribed%3Afalse');
+
+            expect(findAll('[data-test-list="members-list-item"]').length, '# of unsubscribed member rows')
+                .to.equal(4);
+
+            // Check that we can open the filter dropdown and that the right filters are selected
+            await click('[data-test-button="members-filter-actions"]');
+
+            const select = find('[data-test-members-filter="0"] [data-test-select="members-filter"]').value;
+            expect(select.value).to.eql('subscribed');
+
+            const operator = find('[data-test-members-filter="0"] [data-test-select="members-filter-operator"]').value;
+            expect(operator.value).to.eql('is');
+
+            const value = find('[data-test-members-filter="0"] [data-test-select="members-filter-value"]').value;
+            expect(value.value).to.eql('false');
+        });
+        it('can restore newsletter subscribed:true filter', async function () {
+            // add some members to filter
+            this.server.createList('member', 3, {subscribed: true});
+            this.server.createList('member', 4, {subscribed: false});
+
+            await visit('/members?filter=subscribed%3Atrue');
+
+            expect(findAll('[data-test-list="members-list-item"]').length, '# of subscribed member rows')
+                .to.equal(3);
+
+            // Check that we can open the filter dropdown and that the right filters are selected
+            await click('[data-test-button="members-filter-actions"]');
+
+            const select = find('[data-test-members-filter="0"] [data-test-select="members-filter"]').value;
+            expect(select.value).to.eql('subscribed');
+
+            const operator = find('[data-test-members-filter="0"] [data-test-select="members-filter-operator"]').value;
+            expect(operator.value).to.eql('is');
+
+            const value = find('[data-test-members-filter="0"] [data-test-select="members-filter-value"]').value;
+            expect(value.value).to.eql('true');
+        });
+    });
+
     describe('search', function () {
         beforeEach(function () {
             // specific member names+emails so search is deterministic
